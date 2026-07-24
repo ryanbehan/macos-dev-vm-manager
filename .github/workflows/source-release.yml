@@ -1,0 +1,37 @@
+name: Source release candidate
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Validate tag and source
+        run: |
+          test "v$(tr -d '[:space:]' < VERSION)" = "$GITHUB_REF_NAME"
+          PYTHONPATH=src python3 -m unittest discover -s tests
+          swift test --package-path runner
+          shellcheck script/*.sh
+          python3 script/check_release_hygiene.py
+      - name: Prepare scanned source assets
+        run: |
+          python3 script/prepare_source_release.py
+          python3 script/check_release_hygiene.py --archive dist/vmctl-$(tr -d '[:space:]' < VERSION)-source.tar.gz
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        with:
+          name: source-release-candidate
+          path: |
+            dist/*.tar.gz
+            dist/*.sha256
+          if-no-files-found: error
+          retention-days: 14

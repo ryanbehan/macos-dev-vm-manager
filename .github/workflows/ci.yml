@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Environment
+        run: |
+          python3 --version
+          swift --version
+          shellcheck --version
+      - name: Shell
+        run: shellcheck script/*.sh
+      - name: Python tests
+        run: PYTHONPATH=src python3 -m unittest discover -s tests
+      - name: Swift tests
+        run: swift test --package-path runner
+      - name: Build and verify ad hoc app
+        run: ./script/build_runner.sh --signing adhoc
+      - name: Temporary-home source install and idempotent upgrade
+        run: |
+          temporary_home="$(mktemp -d)"
+          trap 'rm -rf "$temporary_home"' EXIT
+          HOME="$temporary_home" ./script/install-from-source.sh --skip-tests
+          HOME="$temporary_home" ./script/install-from-source.sh --skip-tests
+          "$temporary_home/.local/bin/vmctl" --version
+          (cd /tmp && "$temporary_home/.local/bin/vmctl" help setup >/dev/null)
+      - name: Hygiene
+        run: python3 script/check_release_hygiene.py --allow-author
+      - name: Reproducible source archive
+        run: |
+          python3 script/prepare_source_release.py
+          python3 script/check_release_hygiene.py --allow-author --archive dist/vmctl-0.1.0-source.tar.gz

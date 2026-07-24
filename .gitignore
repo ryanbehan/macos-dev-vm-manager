@@ -1,0 +1,57 @@
+# macOS and Python build noise
+.DS_Store
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Generated Swift and app artifacts
+.build/
+runner/.build/
+.swiftpm/
+DerivedData/
+app/
+*.app/
+*.dSYM/
+
+# VM data and runtime state are intentionally local-only
+snapshots/
+recovery/
+state/
+**/VM.bundle/
+*.ipsw
+**/Disk.img
+**/AuxiliaryStorage
+**/HardwareModel
+**/MachineIdentifier
+**/NetworkMACAddress
+*.vzvmsave
+
+# Local configuration, diagnostics, and logs
+config.json
+install-manifest.json
+release.json
+*.log
+logs/
+
+# Credentials and signing material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.cer
+*.crt
+*.mobileprovision
+*.provisionprofile
+*.keychain
+*.keychain-db
+.codex/
+dist/

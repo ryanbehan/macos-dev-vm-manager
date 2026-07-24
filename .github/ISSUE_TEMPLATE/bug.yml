@@ -1,0 +1,34 @@
+name: Bug report
+description: Report reproducible vmctl behavior without private VM data.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Never attach an IPSW, VM bundle, disk, saved state, credential, certificate, or unredacted diagnostic.
+  - type: input
+    id: version
+    attributes:
+      label: vmctl version
+      placeholder: vmctl 0.1.0 protocol=1
+    validations:
+      required: true
+  - type: input
+    id: host
+    attributes:
+      label: Host macOS and hardware
+      placeholder: macOS version and Apple silicon model family
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Use fake or disposable VM data.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostic
+    attributes:
+      label: Redacted diagnostic
+      description: Paste vmctl doctor --share output.
